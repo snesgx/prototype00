@@ -1,4 +1,4 @@
-drop table your_table_name;
+drop table ;
 
 CREATE TABLE your_table_name (
     id SERIAL PRIMARY KEY,
