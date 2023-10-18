@@ -4,17 +4,11 @@
  */
 package com.kudori.FileIndexer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,15 +18,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class IndexingEngine {
   
-        public String test() {
-                
-                ObjectMapper objectMapper = new ObjectMapper();
+        public List<FileInfo> test() {
             
                 try {
-                List<FileInfo> test = listFilesUsingFilesList("/data/ME_Static/MediaME/");  
-                return objectMapper.writeValueAsString(test);
+                List<FileInfo> test = listFilesUsingFilesList("/data/LO/");  
+                return test;
+                //return objectMapper.writeValueAsString(test);
                 } catch (Exception ex)
-                { return ex.getMessage(); }    
+                { return null; }    
                 
         }
     
