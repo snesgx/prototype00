@@ -4,10 +4,12 @@
  */
 package com.kudori.FileIndexer;
 
+import java.time.Instant;
+
 /**
  *
  * @author migi
  */
-public record FileInfo (String filePath, long fileSize, boolean isDirectory) {
+public record FileInfo (String filePath, long fileSize, boolean isDirectory, Instant creationDateTime) {
     
 }

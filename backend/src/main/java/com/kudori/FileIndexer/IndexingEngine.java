@@ -21,7 +21,7 @@ public class IndexingEngine {
         public List<FileInfo> test() {
             
                 try {
-                List<FileInfo> test = listFilesUsingFilesList("/data/LO/");  
+                List<FileInfo> test = listFilesUsingFilesList("/data/LO_Static/Music/");  
                 return test;
                 //return objectMapper.writeValueAsString(test);
                 } catch (Exception ex)
@@ -38,8 +38,9 @@ public class IndexingEngine {
            (filePath, fileAttr) -> {
                if (!fileAttr.isSymbolicLink()) {
                    result.add(new FileInfo(filePath.getFileName().toString(), 
-                                            fileAttr.size(), 
-                                                    fileAttr.isDirectory()));
+                                            fileAttr.size(),
+                                                    fileAttr.isDirectory(),
+                                                fileAttr.creationTime().toInstant()));
                    return true;
                }
                else return false;
