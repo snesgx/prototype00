@@ -23,5 +23,11 @@ public class MainController {
                 return ie.test();
 	}
 
+	@GetMapping("/error")
+	public String indexError() {
+                return "Error entrypoint, nothing here.";
+	}        
+        
+        
 }
         

@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,16 +25,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class IndexingEngine {
   
+        @Autowired
         FileIndexerRepository repository;
     
         public List<FileInfo> test() {
             
                 try {
-                List<FileInfo> test = listFilesUsingFilesList("/data/LO_Static/Music/");  
-                //repository.insertFileList(test);
-                return test;
-                //return objectMapper.writeValueAsString(test);
-                } catch (Exception ex)
+                    List<FileInfo> test = listFilesUsingFilesList("/data/HI_Dynamic/ProgramsHI/");  
+                    repository.insertFileList(test);
+                    return test;
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
                 { return null; }    
                 
         }
