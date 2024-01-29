@@ -4,13 +4,17 @@
  */
 package com.kudori.FileIndexer;
 
-import java.time.Instant;
-import java.util.UUID;
+import java.util.List;
 
 /**
  *
  * @author migi
  */
-public record FileInfo (UUID Id, UUID ParentID, String filePath, long fileSize, boolean isDirectory, Instant creationDateTime) {
+public class FileIndexerRepositoryImpl implements FileIndexerRepository {
+ 
+    @Override
+    public void insertFileList(List<FileInfo> fileList){
+        
+    };
     
 }

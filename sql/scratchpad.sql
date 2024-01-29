@@ -1,11 +1,15 @@
-drop table ;
+USE kudori_local;
 
-CREATE TABLE your_table_name (
-    id SERIAL PRIMARY KEY,
-    filename VARCHAR(255),
-    filecreation_timestamp TIMESTAMP,
-    parent_id INTEGER
+drop table fileindex;
+
+CREATE TABLE fileindex (
+    id BINARY(16) PRIMARY KEY,
+    parent_id BINARY(16),
+    file_path VARCHAR(255),
+    file_size BIGINT,
+    is_directory BOOLEAN,
+    creation_date_time TIMESTAMP
 );
 
 
-select * from your_table_name;
+select * from fileindex;
