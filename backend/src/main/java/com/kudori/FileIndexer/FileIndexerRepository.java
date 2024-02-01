@@ -15,6 +15,6 @@ interface FileIndexerRepository {
     /*
     This will help to insert the list of files in the DB
      */
-    void insertFileList(List<FileInfo> fileList);
+    void saveAll(List<FileInfo> fileList);
     
 }

@@ -11,6 +11,6 @@ import java.util.UUID;
  *
  * @author migi
  */
-public record FileInfo (UUID Id, UUID ParentID, String filePath, long fileSize, boolean isDirectory, Instant creationDateTime) {
+public record FileInfo (byte[] Id, byte[] ParentID, String filePath, long fileSize, boolean isDirectory, Instant creationDateTime) {
     
 }

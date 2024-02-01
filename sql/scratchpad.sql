@@ -11,5 +11,5 @@ CREATE TABLE fileindex (
     creation_date_time TIMESTAMP
 );
 
-
-select * from fileindex;
+delete from fileindex where is_directory < 2;
+select count(*) from fileindex;

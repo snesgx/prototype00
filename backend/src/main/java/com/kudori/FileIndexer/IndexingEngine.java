@@ -31,8 +31,8 @@ public class IndexingEngine {
         public List<FileInfo> test() {
             
                 try {
-                    List<FileInfo> test = listFilesUsingFilesList("/data/HI_Dynamic/ProgramsHI/");  
-                    repository.insertFileList(test);
+                    List<FileInfo> test = listFilesUsingFilesList("/data/ME_Static/EmulatorsRoms/");  
+                    repository.saveAll(test);
                     return test;
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
@@ -51,8 +51,8 @@ public class IndexingEngine {
                if (!fileAttr.isSymbolicLink()) {
                    
                    try {
-                       result.add(new FileInfo( GetMD5HashAsUUID(filePath.toString()),
-                               GetMD5HashAsUUID(filePath.getParent().toString()),
+                       result.add(new FileInfo( GetMD5HashAsBytes(filePath.toString()),
+                               GetMD5HashAsBytes(filePath.getParent().toString()),
                                filePath.getFileName().toString(),
                                fileAttr.size(),
                                fileAttr.isDirectory(),
@@ -73,13 +73,10 @@ public class IndexingEngine {
         
         //UUID has the same size as MD5 sum, so we use as an ID, 
         //  it also makes easier to reconstruct parts of the file system tree, because the ID of the parent folder is always the same
-        private UUID GetMD5HashAsUUID(String string) throws NoSuchAlgorithmException {
+        private byte[] GetMD5HashAsBytes(String string) throws NoSuchAlgorithmException {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(string.getBytes());
-            ByteBuffer byteBuffer = ByteBuffer.wrap(md.digest());
-            long high = byteBuffer.getLong();
-            long low = byteBuffer.getLong();
-            return new UUID(high, low);
+            return md.digest();
         }        
         
 }
