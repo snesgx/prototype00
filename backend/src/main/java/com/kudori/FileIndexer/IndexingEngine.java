@@ -31,8 +31,14 @@ public class IndexingEngine {
         public List<FileInfo> test() {
             
                 try {
-                    List<FileInfo> test = listFilesUsingFilesList("/data/ME_Static/EmulatorsRoms/");  
+                    List<FileInfo> test = listFilesUsingFilesList("/run/media/migi/WIN_DATA");  
+                    
+                    long startTime = System.currentTimeMillis();
+                    
                     repository.saveAll(test);
+                    
+                    System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + " milliseconds");
+                    
                     return test;
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());

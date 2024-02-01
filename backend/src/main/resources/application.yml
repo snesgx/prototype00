@@ -5,6 +5,8 @@ spring:
     username: root
     password: Uqxomal1w
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      rewriteBatchedInserts: true    
 server:
   port : 8081
   

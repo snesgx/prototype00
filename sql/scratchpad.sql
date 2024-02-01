@@ -8,8 +8,14 @@ CREATE TABLE fileindex (
     file_path VARCHAR(255),
     file_size BIGINT,
     is_directory BOOLEAN,
-    creation_date_time TIMESTAMP
+    creation_date_time DATETIME
 );
 
-delete from fileindex where is_directory < 2;
-select count(*) from fileindex;
+
+select * from fileindex order by file_size desc;
+
+delete from fileindex;
+
+select a.file_size,a.file_path,b.file_path  from fileindex a
+ left join fileindex b 
+on a.parent_id=b.id order by a.file_size desc;
