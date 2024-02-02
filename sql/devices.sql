@@ -1,0 +1,4 @@
+CREATE TABLE devices (
+    id SMALLINT PRIMARY KEY AUTO_INCREMENT,
+    device_name VARCHAR(255)
+);

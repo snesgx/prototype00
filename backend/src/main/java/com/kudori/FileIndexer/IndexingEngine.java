@@ -5,14 +5,14 @@
 package com.kudori.FileIndexer;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +28,23 @@ public class IndexingEngine {
         @Autowired
         FileIndexerRepository repository;
     
+        String hostname = "";
+        
+        public IndexingEngine(){
+            try {
+                hostname = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
         public List<FileInfo> test() {
             
                 try {
-                    List<FileInfo> test = listFilesUsingFilesList("/run/media/migi/WIN_DATA");  
+                    
+                    System.out.println("Hostname: " + hostname);
+                    
+                    List<FileInfo> test = listFilesUsingFilesList("/data/git_public/prototype00/");  
                     
                     long startTime = System.currentTimeMillis();
                     
@@ -40,7 +53,7 @@ public class IndexingEngine {
                     System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + " milliseconds");
                     
                     return test;
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     System.out.println(ex.getMessage());
                 }
                 { return null; }    
@@ -62,7 +75,7 @@ public class IndexingEngine {
                                filePath.getFileName().toString(),
                                fileAttr.size(),
                                fileAttr.isDirectory(),
-                               fileAttr.creationTime().toInstant()));
+                               fileAttr.lastModifiedTime().toInstant()));
                    } catch (NoSuchAlgorithmException ex) {
                        Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
                    }

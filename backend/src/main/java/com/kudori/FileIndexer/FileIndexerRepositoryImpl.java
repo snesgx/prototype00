@@ -25,7 +25,7 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
     @Override
     @Transactional
     public void saveAll(List<FileInfo> fileList) { //BATCH
-        jdbcTemplate.batchUpdate("INSERT INTO fileindex (id, parent_id, file_path, file_size, is_directory, creation_date_time) " +
+        jdbcTemplate.batchUpdate("INSERT INTO fileindex (id, parent_id, file_name, file_size, is_directory, modification_date_time) " +
           "VALUES (?, ?, ?, ?, ?, ?)",
                 fileList,
                 1000,
@@ -35,7 +35,7 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
                         ps.setString(3, file.filePath());
                         ps.setLong(4,file.fileSize());
                         ps.setBoolean(5,file.isDirectory());
-                        ps.setTimestamp(6,Timestamp.from(file.creationDateTime()));
+                        ps.setTimestamp(6,Timestamp.from(file.modificationDateTime()));
                     });
     }    
     /*
