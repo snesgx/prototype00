@@ -13,6 +13,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.AccessDeniedException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ public class IndexingEngine {
     
         String hostname = "";
         
+        //Initializing variables, such as hostname
         public IndexingEngine(){
             try {
                 hostname = InetAddress.getLocalHost().getHostName();
@@ -38,54 +41,66 @@ public class IndexingEngine {
             }
         }
         
-        public List<FileInfo> test() {
+        public int test() {
             
                 try {
                     
                     System.out.println("Hostname: " + hostname);
                     
-                    List<FileInfo> test = listFilesUsingFilesList("/data/git_public/prototype00/");  
-                    
-                    long startTime = System.currentTimeMillis();
-                    
-                    repository.saveAll(test);
-                    
+                    long startTime = System.currentTimeMillis();                    
+                    int test = listAndInsertFilesUsingFilesList("/data");  
                     System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + " milliseconds");
                     
                     return test;
                 } catch (IOException ex) {
                     System.out.println(ex.getMessage());
                 }
-                { return null; }    
+                { return -1; }    
                 
         }
     
     
-        public List<FileInfo> listFilesUsingFilesList(String dir) throws IOException {
+        public int listAndInsertFilesUsingFilesList(String dir) throws IOException {
             
+            AtomicInteger itemsCount = new AtomicInteger(0);
             List<FileInfo> result = new ArrayList<>();
-            
-            Files.find(Paths.get(dir), Integer.MAX_VALUE,
-           (filePath, fileAttr) -> {
-               if (!fileAttr.isSymbolicLink()) {
-                   
-                   try {
-                       result.add(new FileInfo( GetMD5HashAsBytes(filePath.toString()),
-                               GetMD5HashAsBytes(filePath.getParent().toString()),
-                               filePath.getFileName().toString(),
-                               fileAttr.size(),
-                               fileAttr.isDirectory(),
-                               fileAttr.lastModifiedTime().toInstant()));
-                   } catch (NoSuchAlgorithmException ex) {
-                       Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
+            int DeviceID = repository.getDeviceID(hostname);
+
+                Files.find(Paths.get(dir), Integer.MAX_VALUE,
+                (filePath, fileAttr) -> {
+                    
+                   if (!fileAttr.isSymbolicLink()) {
+
+                       try {
+                           result.add(new FileInfo( GetMD5HashAsBytes(filePath.toString()),
+                                   filePath.getParent() != null ? GetMD5HashAsBytes(filePath.getParent().toString()) : null,
+                                   filePath.getFileName() != null ? filePath.getFileName().toString() : "",
+                                   fileAttr.size(),
+                                   fileAttr.isDirectory(),
+                                   fileAttr.lastModifiedTime().toInstant()));
+
+                           itemsCount.incrementAndGet();
+
+                           if (result.size() >= 1000) { //Partial insertion of results, this avoid overusing RAM
+                                  repository.saveAll(DeviceID, result);
+                                  result.clear();
+                                  Logger.getLogger("general").log(Level.ALL, itemsCount.toString());
+                           }
+                           
+                       } catch (NoSuchAlgorithmException ex) {
+                           Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
+                       }
+                       return true;
                    }
-                   return true;
-               }
-               else return false;
-               }
-            ).forEach(file -> {});
+                   else return false;
+                }
+                ).forEach(file -> {});
+                
+            if (!result.isEmpty()) { //This is needed because we are using blocks of 1000
+                   repository.saveAll(DeviceID, result);
+            }            
             
-            return result;
+            return itemsCount.get();
 
     
 }

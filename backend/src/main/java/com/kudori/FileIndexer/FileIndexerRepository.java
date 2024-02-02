@@ -15,6 +15,9 @@ interface FileIndexerRepository {
     /*
     This will help to insert the list of files in the DB
      */
-    void saveAll(List<FileInfo> fileList);
+    void saveAll(int DeviceID, List<FileInfo> fileList);
+    
+    //Getting the device ID assigned by the DB
+    int getDeviceID(String hostname);
     
 }

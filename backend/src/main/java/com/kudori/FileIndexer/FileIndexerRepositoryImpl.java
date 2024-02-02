@@ -24,20 +24,26 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
 
     @Override
     @Transactional
-    public void saveAll(List<FileInfo> fileList) { //BATCH
-        jdbcTemplate.batchUpdate("INSERT INTO fileindex (id, parent_id, file_name, file_size, is_directory, modification_date_time) " +
-          "VALUES (?, ?, ?, ?, ?, ?)",
+    public void saveAll(int DeviceID, List<FileInfo> fileList) { //BATCH
+        jdbcTemplate.batchUpdate("INSERT INTO fileindex (id, parent_id, device_id, file_name, file_size, is_directory, modification_date_time) " +
+          "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 fileList,
                 1000,
             (PreparedStatement ps, FileInfo file) -> {
                         ps.setBytes(1, file.Id());
                         ps.setBytes(2, file.ParentID());
-                        ps.setString(3, file.filePath());
-                        ps.setLong(4,file.fileSize());
-                        ps.setBoolean(5,file.isDirectory());
-                        ps.setTimestamp(6,Timestamp.from(file.modificationDateTime()));
+                        ps.setInt(3, DeviceID);
+                        ps.setString(4, file.filePath());
+                        ps.setLong(5,file.fileSize());
+                        ps.setBoolean(6,file.isDirectory());
+                        ps.setTimestamp(7,Timestamp.from(file.modificationDateTime()));
                     });
-    }    
+    }
+    
+    @Override
+    public int getDeviceID(String hostname){
+        return jdbcTemplate.queryForObject("select get_deviceid(?)", int.class, hostname);
+    }
     /*
     @Override
     @Transactional
