@@ -41,8 +41,8 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
     }
     
     @Override
-    public int getDeviceID(String hostname){
-        return jdbcTemplate.queryForObject("select get_deviceid(?)", int.class, hostname);
+    public int getDeviceID(String hostname, String separator){
+        return jdbcTemplate.queryForObject("select get_deviceid(?, ?)", int.class, hostname, separator);
     }
     /*
     @Override

@@ -18,6 +18,6 @@ interface FileIndexerRepository {
     void saveAll(int DeviceID, List<FileInfo> fileList);
     
     //Getting the device ID assigned by the DB
-    int getDeviceID(String hostname);
+    int getDeviceID(String hostname, String separator);
     
 }

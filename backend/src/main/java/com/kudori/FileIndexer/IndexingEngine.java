@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileSystem;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,7 +49,7 @@ public class IndexingEngine {
                     System.out.println("Hostname: " + hostname);
                     
                     long startTime = System.currentTimeMillis();                    
-                    int test = listAndInsertFilesUsingFilesList("/data");  
+                    int test = listAndInsertFilesUsingFilesList("B:\\Trabajos");  
                     System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + " milliseconds");
                     
                     return test;
@@ -64,7 +65,10 @@ public class IndexingEngine {
             
             AtomicInteger itemsCount = new AtomicInteger(0);
             List<FileInfo> result = new ArrayList<>();
-            int DeviceID = repository.getDeviceID(hostname);
+            
+            FileSystem fs = Paths.get(dir).getFileSystem(); 
+
+            int DeviceID = repository.getDeviceID(hostname, fs.getSeparator());
 
                 Files.find(Paths.get(dir), Integer.MAX_VALUE,
                 (filePath, fileAttr) -> {
