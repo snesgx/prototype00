@@ -1,4 +1,4 @@
-DROP FUNCTION get_deviceid;
+DROP FUNCTION IF EXISTS get_deviceid;
 DELIMITER $$
 CREATE FUNCTION get_deviceid(_device_name VARCHAR(255), _separator CHAR(1))
 RETURNS SMALLINT
