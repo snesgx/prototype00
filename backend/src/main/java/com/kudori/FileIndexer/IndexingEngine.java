@@ -15,6 +15,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +33,8 @@ public class IndexingEngine {
         @Autowired
         FileIndexerRepository repository;
     
+        private final AtomicBoolean isIndexing = new AtomicBoolean(false);
+        
         String hostname = "";
         
         //Initializing variables, such as hostname
@@ -42,21 +46,26 @@ public class IndexingEngine {
             }
         }
         
-        public int test() {
+        public int StartIndexing(String path) {
+            
+                isIndexing.set(true);
             
                 try {
                     
                     System.out.println("Hostname: " + hostname);
                     
                     long startTime = System.currentTimeMillis();                    
-                    int test = listAndInsertFilesUsingFilesList("B:\\Trabajos");  
+                    int test = listAndInsertFilesUsingFilesList(path);  
                     System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + " milliseconds");
                     
+                    isIndexing.set(false);
                     return test;
                 } catch (IOException ex) {
                     System.out.println(ex.getMessage());
                 }
-                { return -1; }    
+                { 
+                    isIndexing.set(false);
+                    return -1; }
                 
         }
     
@@ -66,10 +75,19 @@ public class IndexingEngine {
             AtomicInteger itemsCount = new AtomicInteger(0);
             List<FileInfo> result = new ArrayList<>();
             
-            FileSystem fs = Paths.get(dir).getFileSystem(); 
+            Path targetPath = Paths.get(dir);
 
-            int DeviceID = repository.getDeviceID(hostname, fs.getSeparator());
+            FileSystem fs = targetPath.getFileSystem();
 
+            short DeviceID = repository.getDeviceID(hostname, fs.getSeparator());
+
+            //Deleting existing path and children
+            try {
+                repository.deletePath(DeviceID,GetMD5HashAsBytes(targetPath.toString()));
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
                 Files.find(Paths.get(dir), Integer.MAX_VALUE,
                 (filePath, fileAttr) -> {
                     

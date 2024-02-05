@@ -6,9 +6,14 @@ package com.kudori.FileIndexer;
 
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +27,26 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Override
+    @Transactional
+    public void deletePath(short deviceId, byte[] id) {
+        // Set up the stored procedure call
+        SimpleJdbcCall simpleJdbcCall = new SimpleJdbcCall(jdbcTemplate)
+                .withProcedureName("delete_path")
+                .declareParameters(
+                        new SqlParameter("_device_id", Types.SMALLINT),
+                        new SqlParameter("_id", Types.BINARY)
+                );
+
+        // Set up the input parameters
+        Map<String, Object> inParams = new HashMap<>();
+        inParams.put("_device_id", deviceId);
+        inParams.put("_id", id);
+
+        // Execute the stored procedure
+        Map<String, Object> result = simpleJdbcCall.execute(inParams);
+    } 
+    
     @Override
     @Transactional
     public void saveAll(int DeviceID, List<FileInfo> fileList) { //BATCH
@@ -41,25 +66,9 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
     }
     
     @Override
-    public int getDeviceID(String hostname, String separator){
-        return jdbcTemplate.queryForObject("select get_deviceid(?, ?)", int.class, hostname, separator);
+    public short getDeviceID(String hostname, String separator){
+        return jdbcTemplate.queryForObject("select get_deviceid(?, ?)", short.class, hostname, separator);
     }
-    /*
-    @Override
-    @Transactional
-       public void saveAll(List<FileInfo> fileList) { //INDIVIDUAL
-          for (FileInfo entry : fileList) {
-            jdbcTemplate.update("INSERT INTO fileindex (id, parent_id, file_path, file_size, is_directory, creation_date_time) " +
-               "VALUES (?, ?, ?, ?, ?, ?)",
-              entry.Id(),
-              entry.ParentID(),
-              entry.filePath(),
-              entry.fileSize(),
-              entry.isDirectory(),
-              entry.creationDateTime()
-            );
-          }
-    }   
-    */
+
     
 }
