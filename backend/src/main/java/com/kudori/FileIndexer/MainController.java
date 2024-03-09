@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 public class MainController {
@@ -11,16 +12,18 @@ public class MainController {
         @Autowired
         IndexingEngine ie;
     
-	@GetMapping("/")
+	@GetMapping("/startindexing")
 	public int StartIndexing(@RequestParam String path) {
                 return ie.StartIndexing(path);
 	}
 
-	@GetMapping("/error")
-	public String indexError() {
-                return "Error entrypoint, nothing here.";
-	}        
-        
+        @GetMapping("/")
+        public RedirectView redirectToHTML() {
+            RedirectView redirectView = new RedirectView();
+            redirectView.setUrl("/index.html");
+            return redirectView;
+        }
+  
         
 }
         

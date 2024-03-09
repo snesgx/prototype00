@@ -9,13 +9,16 @@ select get_deviceid('ankkes');
 
 select * from devices;
 
-select * from fileindex where device_id=3 order by file_size desc;
+select * from fileindex where device_id=2 order by file_size desc;
 
-select *,get_filefullpath(device_id,id) fullpath from fileindex where device_id=3 order by file_size desc;
+select *,get_filefullpath(device_id,id) fullpath from fileindex where device_id=2 order by file_size desc;
 
 
 select sum(file_size) from fileindex;
 select count(*) from fileindex;
+
+
+select *,get_filefullpath(device_id,id) from fileindex where file_name like '%2016%' order by file_size desc;
 
 
 
