@@ -70,5 +70,9 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
         return jdbcTemplate.queryForObject("select get_deviceid(?, ?)", short.class, hostname, separator);
     }
 
+    @Override
+    public List<Map<String,Object>> getSummary(){
+        return jdbcTemplate.queryForList("call sp_summary()");
+    } 
     
 }

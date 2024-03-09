@@ -1,5 +1,7 @@
 package com.kudori.FileIndexer;
 
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,10 +13,19 @@ public class MainController {
 
         @Autowired
         IndexingEngine ie;
-    
+        
+        @Autowired
+        FileIndexerSearch fis;
+        
+        
 	@GetMapping("/startindexing")
-	public int StartIndexing(@RequestParam String path) {
+	public int startIndexing(@RequestParam String path) {
                 return ie.StartIndexing(path);
+	}
+
+	@GetMapping("/getsummary")
+	public List<Map<String,Object>> getSummary() {
+                return fis.getSummary();
 	}
 
         @GetMapping("/")

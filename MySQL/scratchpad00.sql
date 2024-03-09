@@ -28,3 +28,13 @@ select device_id,id,modification_date_time,
 file_size,get_filefullpath(device_id,id) fullpath   
 from fileindex
 order by file_size DESC LIMIT 100;
+
+
+/* Summary: */
+select a.fs_separator,a.device_name, count(*) files, format_bytes(sum(file_size)) TotalSize from devices a, fileindex b
+where a.id = b.device_id 
+group by a.fs_separator,a.device_name;
+
+
+
+

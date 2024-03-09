@@ -5,6 +5,7 @@
 package com.kudori.FileIndexer;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -22,5 +23,8 @@ interface FileIndexerRepository {
     
     //Getting the device ID assigned by the DB
     short getDeviceID(String hostname, String separator);
+
+    //Getting summary of the data collected
+    List<Map<String,Object>> getSummary();
     
 }
