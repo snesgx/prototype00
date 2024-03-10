@@ -18,8 +18,8 @@ public class MainController {
         FileIndexerSearch fis;
         
         
-	@GetMapping("/startindexing")
-	public int startIndexing(@RequestParam String path) {
+	@GetMapping("/indexing")
+	public int indexing(@RequestParam String path) {
                 return ie.StartIndexing(path);
 	}
 

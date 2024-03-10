@@ -21,6 +21,9 @@ interface FileIndexerRepository {
      */
     void saveAll(int DeviceID, List<FileInfo> fileList);
     
+    //We need to report errors while walking files and directories
+    void saveFileError(int DeviceID, byte[] fileID, String errormsg);
+    
     //Getting the device ID assigned by the DB
     short getDeviceID(String hostname, String separator);
 

@@ -35,6 +35,5 @@ select a.fs_separator,a.device_name, count(*) files, format_bytes(sum(file_size)
 where a.id = b.device_id 
 group by a.fs_separator,a.device_name;
 
-
-
+Select * from fileindex f where device_id =3 and is_directory =1 order by file_name desc;
 

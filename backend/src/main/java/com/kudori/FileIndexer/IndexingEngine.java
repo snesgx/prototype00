@@ -14,7 +14,10 @@ import java.security.NoSuchAlgorithmException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -60,11 +63,12 @@ public class IndexingEngine {
                     isIndexing.set(false);
                     return test;
                 } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
+                    System.out.println(ex.toString());
                 }
                 { 
                     isIndexing.set(false);
-                    return -1; }
+                    return -1; 
+                }
                 
         }
     
@@ -87,35 +91,58 @@ public class IndexingEngine {
                 Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-                Files.find(Paths.get(dir), Integer.MAX_VALUE,
-                (filePath, fileAttr) -> {
+            Files.walkFileTree(targetPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    addElement(file, attrs);
+                    return FileVisitResult.CONTINUE;
                     
-                   if (!fileAttr.isSymbolicLink()) {
-
-                       try {
-                           result.add(new FileInfo( GetMD5HashAsBytes(filePath.toString()),
-                                   filePath.getParent() != null ? GetMD5HashAsBytes(filePath.getParent().toString()) : null,
-                                   filePath.getFileName() != null ? filePath.getFileName().toString() : "",
-                                   fileAttr.size(),
-                                   fileAttr.isDirectory(),
-                                   fileAttr.lastModifiedTime().toInstant()));
-
-                           itemsCount.incrementAndGet();
-
-                           if (result.size() >= 1000) { //Partial insertion of results, this avoid overusing RAM
-                                  repository.saveAll(DeviceID, result);
-                                  result.clear();
-                                  Logger.getLogger("general").log(Level.ALL, itemsCount.toString());
-                           }
-                           
-                       } catch (NoSuchAlgorithmException ex) {
-                           Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
-                       }
-                       return true;
-                   }
-                   else return false;
                 }
-                ).forEach(file -> {});
+
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                    addElement(dir, attrs);
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    addElement(file,Files.readAttributes(file, BasicFileAttributes.class));
+                    
+                    try { //Reporting error into table
+                        repository.saveFileError(DeviceID, GetMD5HashAsBytes(file.toString()), exc.toString());
+                    } catch (NoSuchAlgorithmException ex) {
+                        Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                //Add the element to the DB
+                public void addElement(Path file, BasicFileAttributes attrs){
+                    try {
+                            result.add(new FileInfo( GetMD5HashAsBytes(file.toString()),
+                                    file.getParent() != null ? GetMD5HashAsBytes(file.getParent().toString()) : null,
+                                    file.getFileName() != null ? file.getFileName().toString() : "",
+                                    attrs.size(),
+                                    attrs.isDirectory(),
+                                    attrs.lastModifiedTime().toInstant()));
+                    } catch (NoSuchAlgorithmException ex) {
+                        Logger.getLogger(IndexingEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    }         
+
+                    if (result.size() >= 1000) { //Partial insertion of results, this avoids overusing RAM
+                        repository.saveAll(DeviceID, result);
+                        result.clear();
+                        Logger.getLogger("general").log(Level.ALL, itemsCount.toString());
+                    }                    
+                    
+                    itemsCount.incrementAndGet();
+                   
+                }
+                
+            });
+            
                 
             if (!result.isEmpty()) { //This is needed because we are using blocks of 1000
                    repository.saveAll(DeviceID, result);

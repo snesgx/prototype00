@@ -64,6 +64,15 @@ public class FileIndexerRepositoryImpl implements FileIndexerRepository {
                         ps.setTimestamp(7,Timestamp.from(file.modificationDateTime()));
                     });
     }
+
+    @Override
+    @Transactional
+    public void saveFileError(int DeviceID, byte[] fileID, String errormsg) {
+        jdbcTemplate.update("call sp_insert_file_error (?, ?, ?)",
+                fileID,
+                DeviceID,
+                errormsg);
+    }
     
     @Override
     public short getDeviceID(String hostname, String separator){
