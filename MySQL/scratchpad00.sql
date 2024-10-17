@@ -31,9 +31,7 @@ order by file_size DESC LIMIT 100;
 
 
 /* Summary: */
-select a.fs_separator,a.device_name, count(*) files, format_bytes(sum(file_size)) TotalSize from devices a, fileindex b
-where a.id = b.device_id 
-group by a.fs_separator,a.device_name;
+CALL sp_summary(); 
 
 Select * from fileindex f where device_id =3 and is_directory =1 order by file_name desc;
 
